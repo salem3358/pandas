@@ -607,10 +607,14 @@ def test_as_index_select_column():
 
 def test_groupby_as_index_select_column_sum_empty_df():
     # GH 35246
-    df = DataFrame(columns=["A", "B", "C"])
-    left = df.groupby(by="A", as_index=False)["B"].sum()
-    assert type(left) is DataFrame
-    assert left.to_dict() == {"A": {}, "B": {}}
+    df = pd.DataFrame(columns=["a", "b", "c"])
+    grp = df.groupby(by="a", as_index=False)["b"]
+    result = grp.sum()
+
+    expected = pd.DataFrame(index=pd.Int64Index([], dtype="int64"), columns=["a", "b"])
+    expected["b"] = expected["b"].astype("float64")
+
+    tm.assert_frame_equal(result, expected)
 
 
 def test_groupby_as_index_agg(df):
